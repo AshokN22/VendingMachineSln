@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using VendingMachineLib.Entities;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace VendingMachineLib.File
 {
@@ -10,7 +11,7 @@ namespace VendingMachineLib.File
     {
         private const string InvFilePath = "inventory.csv";
         private const string OrderFilePath = "orders.csv";
-        public Dictionary<string, Item> FetchItems()
+        public async Task<Dictionary<string, Item>> FetchItems()
         {
             Dictionary<string, Item> items = new Dictionary<string, Item>();
             if(System.IO.File.Exists(InvFilePath))
@@ -19,7 +20,7 @@ namespace VendingMachineLib.File
                 if (fs.Length == 0)
                 {
                     StreamReader sr = new StreamReader(fs);
-                    string data = sr.ReadLine();
+                    string data = await sr.ReadLineAsync();
                     string[] itmRecord = data.Split(",");
                     Item itm = new Item
                     {
@@ -44,7 +45,7 @@ namespace VendingMachineLib.File
             return items;
         }
 
-        public Dictionary<string, Order> FetchOrders()
+        public async Task<Dictionary<string, Order>> FetchOrders()
         {
             Dictionary<string, Order> orders = new Dictionary<string, Order>();
             if (System.IO.File.Exists(OrderFilePath))
@@ -53,7 +54,7 @@ namespace VendingMachineLib.File
                 if (fs.Length == 0)
                 {
                     StreamReader sr = new StreamReader(fs);
-                    string data = sr.ReadLine();
+                    string data = await sr.ReadLineAsync();
                     string[] ordRecord = data.Split(",");
                     Order itm = new Order
                     {
@@ -78,13 +79,13 @@ namespace VendingMachineLib.File
             return orders;
         }
 
-        public void SaveOrder(Order order)
+        public async Task SaveOrder(Order order)
         {
             if (System.IO.File.Exists(OrderFilePath))
             {
                 StreamWriter sw = new StreamWriter(OrderFilePath, true);
                 string orderRecord = $"{order.OID},{order.Amount},{order.Item.ID},{order.Quantity}";
-                sw.WriteLine(orderRecord);
+                await sw.WriteLineAsync(orderRecord);
                 sw.Flush();
                 sw.Dispose();
                 sw.Close();

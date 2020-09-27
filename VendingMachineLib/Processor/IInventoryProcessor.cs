@@ -7,7 +7,6 @@ namespace VendingMachineLib.Processor
 {
     public interface IInventoryProcessor
     {
-        IOrderProcessor OrderProcessor { get; set; }
         Dictionary<string, Item> GetItems();
     }
 }

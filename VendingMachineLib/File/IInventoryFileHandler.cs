@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using VendingMachineLib.Entities;
 
 namespace VendingMachineLib.File
 {
     public interface IInventoryFileHandler
     {
-        Dictionary<string, Item> FetchItems();
+        Task<Dictionary<string, Item>> FetchItems();
     }
 }

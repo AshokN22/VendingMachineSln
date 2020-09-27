@@ -7,11 +7,11 @@ namespace VendingMachineLib.Processor
 {
     public class OrderProcessor : IOrderProcessor
     {
-        private IInventoryProcessor InventoryProcessor = null;
+        private IInventoryProcessor inventoryProcessor = null;
 
         public OrderProcessor(IInventoryProcessor invProcessor)
         {
-            InventoryProcessor = invProcessor;
+            inventoryProcessor = invProcessor;
         }
 
         public Dictionary<string, Order> GetOrders()
