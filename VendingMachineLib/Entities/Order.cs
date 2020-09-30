@@ -10,5 +10,10 @@ namespace VendingMachineLib.Entities
         public float Amount { get; set; }
         public Item Item { get; set; }
         public int Quantity { get; set; }
+
+        public override string ToString()
+        {
+            return $"{OID},{Amount},{Item.ToString()},{Quantity}";
+        }
     }
 }

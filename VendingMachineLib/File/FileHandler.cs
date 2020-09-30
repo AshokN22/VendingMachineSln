@@ -9,27 +9,54 @@ namespace VendingMachineLib.File
 {
     public class FileHandler : IOrderFileHandler, IInventoryFileHandler
     {
-        private const string InvFilePath = "inventory.csv";
-        private const string OrderFilePath = "orders.csv";
+        private string invFilePath = null;
+        private string orderFilePath = null;
+
+        public string OrderCSVPath
+        { 
+            get 
+            { 
+                return orderFilePath; 
+            }
+            set 
+            { 
+                orderFilePath = value; 
+            }
+        }
+        public string ItemCSVPath 
+        { 
+            get 
+            {
+                return invFilePath;
+            }
+            set 
+            {
+                invFilePath = value;
+            } 
+        }
+
         public async Task<Dictionary<string, Item>> FetchItems()
         {
             Dictionary<string, Item> items = new Dictionary<string, Item>();
-            if(System.IO.File.Exists(InvFilePath))
+            if(System.IO.File.Exists(invFilePath))
             {
-                FileStream fs = new FileStream(InvFilePath, FileMode.Open, FileAccess.Read);
-                if (fs.Length == 0)
+                StreamReader sr = new StreamReader(invFilePath);
+                if (!sr.EndOfStream)
                 {
-                    StreamReader sr = new StreamReader(fs);
-                    string data = await sr.ReadLineAsync();
-                    string[] itmRecord = data.Split(",");
-                    Item itm = new Item
+                    while (!sr.EndOfStream)
                     {
-                        ID = int.Parse(itmRecord[0]),
-                        Name = itmRecord[1],
-                        Quantity = int.Parse(itmRecord[2]),
-                        Price = float.Parse(itmRecord[3])
-                    };
-                    items.Add(itmRecord[0], itm);
+                        string data = await sr.ReadLineAsync();
+                        string[] itmRecord = data.Split(",");
+                        
+                        Item itm = new Item
+                        {
+                            ID = int.Parse(itmRecord[0]),
+                            Name = itmRecord[1],
+                            Quantity = int.Parse(itmRecord[2]),
+                            Price = float.Parse(itmRecord[3])
+                        };
+                        items.Add(itmRecord[0], itm);
+                    }
                     sr.Dispose();
                     sr.Close();
                 }
@@ -48,42 +75,44 @@ namespace VendingMachineLib.File
         public async Task<Dictionary<string, Order>> FetchOrders()
         {
             Dictionary<string, Order> orders = new Dictionary<string, Order>();
-            if (System.IO.File.Exists(OrderFilePath))
+            if (System.IO.File.Exists(orderFilePath))
             {
-                FileStream fs = new FileStream(OrderFilePath, FileMode.Open, FileAccess.Read);
-                if (fs.Length == 0)
+                StreamReader sr = new StreamReader(orderFilePath);
+                if (!sr.EndOfStream)
                 {
-                    StreamReader sr = new StreamReader(fs);
-                    string data = await sr.ReadLineAsync();
-                    string[] ordRecord = data.Split(",");
-                    Order itm = new Order
+                    while (!sr.EndOfStream)
                     {
-                        OID = int.Parse(ordRecord[0]),
-                        Amount = float.Parse(ordRecord[1]),
-                        Item = new Item { ID = int.Parse(ordRecord[2]) },
-                        Quantity = int.Parse(ordRecord[3])
-                    };
-                    orders.Add(ordRecord[0], itm);
+                        string data = await sr.ReadLineAsync();
+                        string[] ordRecord = data.Split(",");
+                        Order itm = new Order
+                        {
+                            OID = int.Parse(ordRecord[0]),
+                            Amount = float.Parse(ordRecord[1]),
+                            Item = new Item { ID = int.Parse(ordRecord[2]) },
+                            Quantity = int.Parse(ordRecord[3])
+                        };
+                        orders.Add(ordRecord[0], itm);
+                    }
                     sr.Dispose();
                     sr.Close();
                 }
                 else
                 {
-                    throw new Exception("No order record present in the orders file.");
+                    throw new Exception("No orders record present in the OrderFile.");
                 }
             }
             else
             {
-                throw new Exception("System error with order.csv file. Please contact your adminstrator for further assistance.");
+                throw new Exception("System error with orders.csv file. Please contact your adminstrator for further assistance.");
             }
             return orders;
         }
 
         public async Task SaveOrder(Order order)
         {
-            if (System.IO.File.Exists(OrderFilePath))
+            if (System.IO.File.Exists(orderFilePath))
             {
-                StreamWriter sw = new StreamWriter(OrderFilePath, true);
+                StreamWriter sw = new StreamWriter(orderFilePath, true);
                 string orderRecord = $"{order.OID},{order.Amount},{order.Item.ID},{order.Quantity}";
                 await sw.WriteLineAsync(orderRecord);
                 sw.Flush();
@@ -92,7 +121,7 @@ namespace VendingMachineLib.File
             }
             else
             {
-                throw new Exception("System error with order.csv file. Please contact your adminstrator for further assistance.");
+                throw new Exception("System error with orders.csv file. Please contact your adminstrator for further assistance.");
             }
         }
     }

@@ -8,7 +8,8 @@ namespace VendingMachineLib.File
 {
     public interface IOrderFileHandler
     {
-        async Task<Dictionary<string, Order>> FetchOrders();
+        string OrderCSVPath { get; set; }
+        Task<Dictionary<string, Order>> FetchOrders();
         Task SaveOrder(Order order);
 
     }

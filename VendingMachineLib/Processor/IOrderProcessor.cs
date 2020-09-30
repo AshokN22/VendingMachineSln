@@ -8,6 +8,7 @@ namespace VendingMachineLib.Processor
 {
     public interface IOrderProcessor
     {
+        IInventoryProcessor InventoryProcessor { get; set; }
         Task<Dictionary<string, Order>> GetOrders();
         Task<string> SaveOrder(Order order);
     }

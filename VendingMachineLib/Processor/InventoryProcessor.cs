@@ -13,19 +13,39 @@ namespace VendingMachineLib.Processor
         private IOrderProcessor orderProcessor = null;
         private IInventoryFileHandler invhandler = null;
 
-        public InventoryProcessor(IOrderProcessor ordProcessor)
+        public InventoryProcessor(IInventoryFileHandler handler)
         {
-            orderProcessor = ordProcessor;
-            invhandler = new FileHandler();
+            invhandler = handler;
+        }
+
+        public IOrderProcessor OrderProdcessor
+        {
+            get
+            {
+                return orderProcessor;
+            }
+            set
+            {
+                orderProcessor = value;
+            }
         }
 
         public async Task<Dictionary<string, Item>> GetItems()
         {
-            var orders = await orderProcessor.GetOrders();
+            Dictionary<string, Order> orders = null;
+            try
+            {
+                orders = await orderProcessor.GetOrders();
+            }
+            catch
+            {
+                 
+            }            
+            
             var items = await invhandler.FetchItems();
             foreach(var itmKey in items.Keys)
             {
-                int sum = orders?.Values.Where(o => o.Item.ID == int.Parse(itmKey)).Sum(o => o.Item.Quantity)??0;
+                int sum = orders?.Values.Where(o => o.Item.ID == int.Parse(itmKey)).Sum(o => o.Quantity)??0;
                 items[itmKey].Quantity -= sum;
             }
             return items;
